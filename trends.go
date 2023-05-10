@@ -25,14 +25,14 @@ type TrendData struct {
 }
 
 // GetTrends return list of trends.
-func (s *Scraper) GetTrends() ([]Trend, error) {
+func (s *Scraper) GetTrends(WOEID string) ([]Trend, error) {
 	req, err := s.newRequest("GET", "https://api.twitter.com/1.1/trends/place.json")
 	if err != nil {
 		return nil, err
 	}
 
 	q := req.URL.Query()
-	q.Add("id", "23424819") // Paris / France
+	q.Add("id", WOEID) // 23424819 Paris / France
 	req.URL.RawQuery = q.Encode()
 
 	var jsn []TrendData
@@ -51,6 +51,6 @@ func (s *Scraper) GetTrends() ([]Trend, error) {
 }
 
 // Deprecated: GetTrends wrapper for default Scraper
-func GetTrends() ([]Trend, error) {
-	return defaultScraper.GetTrends()
+func GetTrends(WOEID string) ([]Trend, error) {
+	return defaultScraper.GetTrends(WOEID)
 }
