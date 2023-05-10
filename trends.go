@@ -5,14 +5,23 @@ import (
 )
 
 type Trend struct {
-	Name            string `json:"name"`
-	Url             string `json:"url"`
-	PromotedContent string `json:"promoted_content"`
-	Query           string `json:"query"`
-	TweetVolume     int    `json:"tweet_volume"`
+	Name            string      `json:"name"`
+	PromotedContent interface{} `json:"promoted_content"`
+	Query           string      `json:"query"`
+	TweetVolume     interface{} `json:"tweet_volume"`
+	URL             string      `json:"url"`
 }
-type Trends struct {
-	Trends []Trend `json:"trends"`
+
+type Location struct {
+	Name  string  `json:"name"`
+	Woeid float64 `json:"woeid"`
+}
+
+type TrendData struct {
+	AsOf      string     `json:"as_of"`
+	CreatedAt string     `json:"created_at"`
+	Locations []Location `json:"locations"`
+	Trends    []Trend    `json:"trends"`
 }
 
 // GetTrends return list of trends.
@@ -26,7 +35,7 @@ func (s *Scraper) GetTrends() ([]Trend, error) {
 	q.Add("id", "23424819") // Paris / France
 	req.URL.RawQuery = q.Encode()
 
-	var jsn Trends
+	var jsn []TrendData
 	s.setBearerToken(bearerToken2)
 	err = s.RequestAPI(req, &jsn)
 	s.setBearerToken(bearerToken)
@@ -34,11 +43,11 @@ func (s *Scraper) GetTrends() ([]Trend, error) {
 		return nil, err
 	}
 
-	if len(jsn.Trends) < 2 {
+	if len(jsn) == 0 || len(jsn[0].Trends) == 0 {
 		return nil, fmt.Errorf("no trend entries found")
 	}
 
-	return jsn.Trends, nil
+	return jsn[0].Trends, nil
 }
 
 // Deprecated: GetTrends wrapper for default Scraper

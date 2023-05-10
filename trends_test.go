@@ -18,7 +18,7 @@ func TestGetTrends(t *testing.T) {
 	}
 
 	for _, trend := range trends {
-		if trend == "" {
+		if trend.Name == "" {
 			t.Error("Expected trend is empty")
 		}
 	}
