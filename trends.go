@@ -1,22 +1,32 @@
 package twitterscraper
 
-import "fmt"
+import (
+	"fmt"
+)
+
+type Trend struct {
+	Name            string `json:"name"`
+	Url             string `json:"url"`
+	PromotedContent string `json:"promoted_content"`
+	Query           string `json:"query"`
+	TweetVolume     int    `json:"tweet_volume"`
+}
+type Trends struct {
+	Trends []Trend `json:"trends"`
+}
 
 // GetTrends return list of trends.
-func (s *Scraper) GetTrends() ([]string, error) {
-	req, err := s.newRequest("GET", "https://twitter.com/i/api/2/guide.json")
+func (s *Scraper) GetTrends() ([]Trend, error) {
+	req, err := s.newRequest("GET", "https://api.twitter.com/1.1/trends/place.json")
 	if err != nil {
 		return nil, err
 	}
 
 	q := req.URL.Query()
-	q.Add("count", "20")
-	q.Add("candidate_source", "trends")
-	q.Add("include_page_configuration", "false")
-	q.Add("entity_tokens", "false")
+	q.Add("id", "23424819") // Paris / France
 	req.URL.RawQuery = q.Encode()
 
-	var jsn timeline
+	var jsn Trends
 	s.setBearerToken(bearerToken2)
 	err = s.RequestAPI(req, &jsn)
 	s.setBearerToken(bearerToken)
@@ -24,19 +34,14 @@ func (s *Scraper) GetTrends() ([]string, error) {
 		return nil, err
 	}
 
-	if len(jsn.Timeline.Instructions[1].AddEntries.Entries) < 2 {
+	if len(jsn.Trends) < 2 {
 		return nil, fmt.Errorf("no trend entries found")
 	}
 
-	var trends []string
-	for _, item := range jsn.Timeline.Instructions[1].AddEntries.Entries[1].Content.TimelineModule.Items {
-		trends = append(trends, item.Item.ClientEventInfo.Details.GuideDetails.TransparentGuideDetails.TrendMetadata.TrendName)
-	}
-
-	return trends, nil
+	return jsn.Trends, nil
 }
 
 // Deprecated: GetTrends wrapper for default Scraper
-func GetTrends() ([]string, error) {
+func GetTrends() ([]Trend, error) {
 	return defaultScraper.GetTrends()
 }
