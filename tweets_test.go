@@ -76,7 +76,7 @@ func TestGetTweet(t *testing.T) {
 		HTML:         "That thing you didn’t Tweet but wanted to but didn’t but got so close but then were like nah. <br><br>We have a place for that now—Fleets! <br><br>Rolling out to everyone starting today. <br><a href=\"https://t.co/auQAHXZMfH\"><img src=\"https://pbs.twimg.com/amplify_video_thumb/1328684333599756289/img/cP5KwbIXbGunNSBy.jpg\"/></a>",
 		ID:           "1328684389388185600",
 		PermanentURL: "https://twitter.com/Twitter/status/1328684389388185600",
-		Photos:       []string{"https://pbs.twimg.com/amplify_video_thumb/1328684333599756289/img/cP5KwbIXbGunNSBy.jpg"},
+		Photos:       nil,
 		Text:         "That thing you didn’t Tweet but wanted to but didn’t but got so close but then were like nah. \n\nWe have a place for that now—Fleets! \n\nRolling out to everyone starting today. https://t.co/auQAHXZMfH",
 		TimeParsed:   time.Date(2020, 11, 17, 13, 0, 18, 0, time.FixedZone("UTC", 0)),
 		Timestamp:    1605618018,
@@ -99,21 +99,41 @@ func TestGetTweet(t *testing.T) {
 	}
 }
 
+func TestTweetMentions(t *testing.T) {
+	sample := []twitterscraper.Mention{{
+		ID:       "7018222",
+		Username: "davidmcraney",
+		Name:     "David McRaney",
+	}}
+	scraper := twitterscraper.New()
+	tweet, err := scraper.GetTweet("1554522888904101890")
+	if err != nil {
+		t.Error(err)
+	} else {
+		if diff := cmp.Diff(sample, tweet.Mentions, cmpOptions...); diff != "" {
+			t.Error("Resulting tweet does not match the sample", diff)
+		}
+	}
+}
+
 func TestQuotedAndReply(t *testing.T) {
 	sample := &twitterscraper.Tweet{
 		HTML:         "The Easiest Problem Everyone Gets Wrong <br><br>[new video] --&gt; <a href=\"https://youtu.be/ytfCdqWhmdg\">https://t.co/YdaeDYmPAU</a> <br><a href=\"https://t.co/iKu4Xs6o2V\"><img src=\"https://pbs.twimg.com/media/ESsZa9AXgAIAYnF.jpg\"/></a>",
 		ID:           "1237110546383724547",
 		Likes:        485,
 		PermanentURL: "https://twitter.com/VsauceTwo/status/1237110546383724547",
-		Photos:       []string{"https://pbs.twimg.com/media/ESsZa9AXgAIAYnF.jpg"},
-		Replies:      12,
-		Retweets:     18,
-		Text:         "The Easiest Problem Everyone Gets Wrong \n\n[new video] --&gt; https://t.co/YdaeDYmPAU https://t.co/iKu4Xs6o2V",
-		TimeParsed:   time.Date(2020, 03, 9, 20, 18, 33, 0, time.FixedZone("UTC", 0)),
-		Timestamp:    1583785113,
-		URLs:         []string{"https://youtu.be/ytfCdqWhmdg"},
-		UserID:       "978944851",
-		Username:     "VsauceTwo",
+		Photos: []twitterscraper.Photo{{
+			ID:  "1237110473486729218",
+			URL: "https://pbs.twimg.com/media/ESsZa9AXgAIAYnF.jpg",
+		}},
+		Replies:    12,
+		Retweets:   18,
+		Text:       "The Easiest Problem Everyone Gets Wrong \n\n[new video] --&gt; https://t.co/YdaeDYmPAU https://t.co/iKu4Xs6o2V",
+		TimeParsed: time.Date(2020, 0o3, 9, 20, 18, 33, 0, time.FixedZone("UTC", 0)),
+		Timestamp:  1583785113,
+		URLs:       []string{"https://youtu.be/ytfCdqWhmdg"},
+		UserID:     "978944851",
+		Username:   "VsauceTwo",
 	}
 	scraper := twitterscraper.New()
 	tweet, err := scraper.GetTweet("1237110897597976576")

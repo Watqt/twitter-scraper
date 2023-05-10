@@ -27,6 +27,11 @@ type timeline struct {
 					ExpandedURL string `json:"expanded_url"`
 					URL         string `json:"url"`
 				} `json:"urls"`
+				UserMentions []struct {
+					IDStr      string `json:"id_str"`
+					Name       string `json:"name"`
+					ScreenName string `json:"screen_name"`
+				} `json:"user_mentions"`
 			} `json:"entities"`
 			ExtendedEntities struct {
 				Media []struct {
@@ -200,9 +205,22 @@ func (timeline *timeline) parseTweet(id string) *Tweet {
 			tw.Hashtags = append(tw.Hashtags, hash.Text)
 		}
 
+		for _, mention := range tweet.Entities.UserMentions {
+			tw.Mentions = append(tw.Mentions, Mention{
+				ID:       mention.IDStr,
+				Username: mention.ScreenName,
+				Name:     mention.Name,
+			})
+		}
+
 		for _, media := range tweet.ExtendedEntities.Media {
 			if media.Type == "photo" {
-				tw.Photos = append(tw.Photos, media.MediaURLHttps)
+				photo := Photo{
+					ID:  media.IDStr,
+					URL: media.MediaURLHttps,
+				}
+
+				tw.Photos = append(tw.Photos, photo)
 			} else if media.Type == "video" {
 				video := Video{
 					ID:      media.IDStr,
@@ -217,7 +235,6 @@ func (timeline *timeline) parseTweet(id string) *Tweet {
 					}
 				}
 
-				tw.Photos = append(tw.Photos, video.Preview)
 				tw.Videos = append(tw.Videos, video)
 			}
 
@@ -259,7 +276,15 @@ func (timeline *timeline) parseTweet(id string) *Tweet {
 			}
 			return tco
 		})
-		for _, url := range tw.Photos {
+		for _, photo := range tw.Photos {
+			url := photo.URL
+			if stringInSlice(url, foundedMedia) {
+				continue
+			}
+			tw.HTML += fmt.Sprintf(`<br><img src="%s"/>`, url)
+		}
+		for _, video := range tw.Videos {
+			url := video.Preview
 			if stringInSlice(url, foundedMedia) {
 				continue
 			}

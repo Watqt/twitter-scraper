@@ -3,6 +3,19 @@ package twitterscraper
 import "time"
 
 type (
+	// Mention type.
+	Mention struct {
+		ID       string
+		Username string
+		Name     string
+	}
+
+	// Photo type.
+	Photo struct {
+		ID  string
+		URL string
+	}
+
 	// Video type.
 	Video struct {
 		ID      string
@@ -21,8 +34,9 @@ type (
 		IsReply          bool
 		IsRetweet        bool
 		Likes            int
+		Mentions         []Mention
 		PermanentURL     string
-		Photos           []string
+		Photos           []Photo
 		Place            *Place
 		QuotedStatus     *Tweet
 		Replies          int
