@@ -12,14 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.13
+    - name: Set up Go 1.16
       uses: actions/setup-go@v3
       with:
-        go-version: 1.13
+        go-version: 1.16
       id: go
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v3
 
     - name: Test
+      env:
+        TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
+        TWITTER_PASSWORD: ${{ secrets.TWITTER_PASSWORD }}
+        TWITTER_EMAIL: ${{ secrets.TWITTER_EMAIL }}
       run: go test -v

@@ -49,8 +49,3 @@ func (s *Scraper) GetTrends(WOEID string) ([]Trend, error) {
 
 	return jsn[0].Trends, nil
 }
-
-// Deprecated: GetTrends wrapper for default Scraper
-func GetTrends(WOEID string) ([]Trend, error) {
-	return defaultScraper.GetTrends(WOEID)
-}
