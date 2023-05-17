@@ -25,6 +25,7 @@ type Scraper struct {
 	isLogged       bool
 	searchMode     SearchMode
 	wg             sync.WaitGroup
+	flowToken      string
 }
 
 // SearchMode type
@@ -66,6 +67,22 @@ func (s *Scraper) setBearerToken(token string) {
 // IsGuestToken check if guest token not empty
 func (s *Scraper) IsGuestToken() bool {
 	return s.guestToken != ""
+}
+
+func (s *Scraper) GetFlowToken() string {
+	return s.flowToken
+}
+
+func (s *Scraper) GetGuestTokenSession() string {
+	return s.guestToken
+}
+
+func (s *Scraper) SetGuestTokenSession(token string) {
+	s.guestToken = token
+}
+
+func (s *Scraper) SetIsLogged(isLogged bool) {
+	s.isLogged = isLogged
 }
 
 // SetSearchMode switcher

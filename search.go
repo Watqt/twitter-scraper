@@ -3,6 +3,7 @@ package twitterscraper
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -58,6 +59,7 @@ func (s *Scraper) getSearchTimeline(query string, maxNbr int, cursor string) (*t
 	var timeline timeline
 	err = s.RequestAPI(req, &timeline)
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		return nil, err
 	}
 	return &timeline, nil

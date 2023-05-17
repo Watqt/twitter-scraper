@@ -225,7 +225,7 @@ func (s *Scraper) Login(credentials ...string) error {
 			return err
 		}
 	}
-
+	s.flowToken = flowToken
 	s.isLogged = true
 	return nil
 }
